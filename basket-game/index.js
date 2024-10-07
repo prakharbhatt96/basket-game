@@ -1,7 +1,7 @@
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: window.innerWidth, // Use window width
+    height: window.innerHeight, // Use window height
     backgroundColor: '#000',
     physics: {
         default: 'arcade',
@@ -11,6 +11,10 @@ const config = {
         preload: preload,
         create: create,
         update: update
+    },
+    scale: {
+        mode: Phaser.Scale.FIT, // Fit mode for responsive scaling
+        autoCenter: Phaser.Scale.CENTER_BOTH // Center the canvas
     }
 };
 
@@ -21,7 +25,7 @@ let foodGroup;
 let foodSpeed = 100;
 let score = 0;
 let scoreText;
-let foodTimer; // Timer reference for spawning food
+let foodTimer; 
 
 const game = new Phaser.Game(config);
 
@@ -32,10 +36,23 @@ function preload() {
 }
 
 function create() {
-    const board = this.add.image(400, 300, 'board'); 
+    // Create the board image and set its origin
+    const board = this.add.image(config.width / 2, config.height / 2, 'board'); // Center the board
     board.setOrigin(0.5, 0.5);
 
-    basket = this.physics.add.sprite(400, 600, 'basket');
+    // Scale the board to fit the game dimensions
+    const boardAspectRatio = board.width / board.height; // Get the aspect ratio of the board
+    const gameAspectRatio = config.width / config.height; // Get the aspect ratio of the game
+
+    if (boardAspectRatio > gameAspectRatio) {
+        // If the board is wider than the game, scale by width
+        board.setDisplaySize(config.width, config.width / boardAspectRatio);
+    } else {
+        // If the board is taller than the game, scale by height
+        board.setDisplaySize(config.height * boardAspectRatio, config.height);
+    }
+
+    basket = this.physics.add.sprite(config.width / 2, config.height - 50, 'basket'); // Position at the bottom
     basket.setOrigin(0.5, 0.5);
     basket.setCollideWorldBounds(true);  
     basket.setScale(0.2);
@@ -46,9 +63,7 @@ function create() {
 
     this.physics.add.collider(basket, foodGroup, catchFood, null, this);
 
-    scoreText = this.add.text(10, 30, 'Score: ' + score, { font: "bold 22px Arial", fill: '#fff' });
-
-    // Create a timer for spawning food
+    scoreText = this.add.text(10, 10, 'Score: ' + score, { font: "bold 22px Arial", fill: '#fff' }); // Adjust score text position
     foodTimer = this.time.addEvent({
         delay: 1000,  
         callback: spawnFood,
@@ -57,8 +72,8 @@ function create() {
     });
 }
 
+
 function update() {
-    // Check if cursors is defined before trying to access its properties
     if (cursors) {
         if (cursors.left.isDown) {
             basket.setVelocityX(-300); 
@@ -70,14 +85,14 @@ function update() {
     }
 
     foodGroup.children.each(function(foodItem) {
-        if (foodItem.y > 600) {
+        if (foodItem.y > config.height) { // Use config.height instead of hardcoded value
             foodItem.destroy();  
         }
     }, this);
 }
 
 function spawnFood() {
-    const x = Phaser.Math.Between(50, 750);
+    const x = Phaser.Math.Between(50, config.width - 50); // Use config.width for boundaries
     food = foodGroup.create(x, -10, 'food');  
     food.setVelocityY(foodSpeed);           
     food.setScale(0.1);                    
@@ -87,18 +102,21 @@ function catchFood(basket, food) {
     score += 1;
     scoreText.setText('Score: ' + score);
     food.destroy();  
-
-    // Check for the win condition
     if (score === 10) {
         foodGroup.clear(true, true); 
         foodSpeed = 0; 
         foodTimer.paused = true; 
 
         console.log("You win the match!");
-        WinningText = this.add.text(250, 300, "You win the match!", { font: "bold 32px Arial", fill: '#000' });
+        WinningText = this.add.text(config.width / 2 - 100, config.height / 2, "You win the match!", { font: "bold 32px Arial", fill: '#000' }); // Center win text
         game.scene.pause(); 
 
         basket.setVelocityX(0);
         cursors = null; 
     }
 }
+
+// Resize the game when the window size changes
+window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+});
