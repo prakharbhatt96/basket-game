@@ -108,7 +108,7 @@ function catchFood(basket, food) {
         foodTimer.paused = true; 
 
         console.log("You win the match!");
-        WinningText = this.add.text(config.width / 2 - 100, config.height / 2, "You win the match!", { font: "bold 32px Arial", fill: '#000' }); // Center win text
+        WinningText = this.add.text(config.width / 2 - 100, config.height / 2, "You win the match!", { font: "bold 32px Arial", fill: '#000' }); 
         game.scene.pause(); 
 
         basket.setVelocityX(0);
