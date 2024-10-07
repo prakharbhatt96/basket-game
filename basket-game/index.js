@@ -1,7 +1,7 @@
 const config = {
     type: Phaser.AUTO,
-    width: window.innerWidth, // Use window width
-    height: window.innerHeight, // Use window height
+    width: window.innerWidth, 
+    height: window.innerHeight, 
     backgroundColor: '#000',
     physics: {
         default: 'arcade',
@@ -13,8 +13,8 @@ const config = {
         update: update
     },
     scale: {
-        mode: Phaser.Scale.FIT, // Fit mode for responsive scaling
-        autoCenter: Phaser.Scale.CENTER_BOTH // Center the canvas
+        mode: Phaser.Scale.FIT, 
+        autoCenter: Phaser.Scale.CENTER_BOTH 
     }
 };
 
@@ -36,23 +36,23 @@ function preload() {
 }
 
 function create() {
-    // Create the board image and set its origin
-    const board = this.add.image(config.width / 2, config.height / 2, 'board'); // Center the board
+    
+    const board = this.add.image(config.width / 2, config.height / 2, 'board'); 
     board.setOrigin(0.5, 0.5);
 
-    // Scale the board to fit the game dimensions
-    const boardAspectRatio = board.width / board.height; // Get the aspect ratio of the board
-    const gameAspectRatio = config.width / config.height; // Get the aspect ratio of the game
+  
+    const boardAspectRatio = board.width / board.height; 
+    const gameAspectRatio = config.width / config.height;
 
     if (boardAspectRatio > gameAspectRatio) {
-        // If the board is wider than the game, scale by width
+      
         board.setDisplaySize(config.width, config.width / boardAspectRatio);
     } else {
-        // If the board is taller than the game, scale by height
+        
         board.setDisplaySize(config.height * boardAspectRatio, config.height);
     }
 
-    basket = this.physics.add.sprite(config.width / 2, config.height - 50, 'basket'); // Position at the bottom
+    basket = this.physics.add.sprite(config.width / 2, config.height - 50, 'basket'); 
     basket.setOrigin(0.5, 0.5);
     basket.setCollideWorldBounds(true);  
     basket.setScale(0.2);
@@ -63,7 +63,7 @@ function create() {
 
     this.physics.add.collider(basket, foodGroup, catchFood, null, this);
 
-    scoreText = this.add.text(10, 10, 'Score: ' + score, { font: "bold 22px Arial", fill: '#fff' }); // Adjust score text position
+    scoreText = this.add.text(10, 10, 'Score: ' + score, { font: "bold 22px Arial", fill: '#fff' }); 
     foodTimer = this.time.addEvent({
         delay: 1000,  
         callback: spawnFood,
@@ -85,14 +85,14 @@ function update() {
     }
 
     foodGroup.children.each(function(foodItem) {
-        if (foodItem.y > config.height) { // Use config.height instead of hardcoded value
+        if (foodItem.y > config.height) { 
             foodItem.destroy();  
         }
     }, this);
 }
 
 function spawnFood() {
-    const x = Phaser.Math.Between(50, config.width - 50); // Use config.width for boundaries
+    const x = Phaser.Math.Between(50, config.width - 50); 
     food = foodGroup.create(x, -10, 'food');  
     food.setVelocityY(foodSpeed);           
     food.setScale(0.1);                    
@@ -116,7 +116,6 @@ function catchFood(basket, food) {
     }
 }
 
-// Resize the game when the window size changes
 window.addEventListener('resize', () => {
     game.scale.resize(window.innerWidth, window.innerHeight);
 });
